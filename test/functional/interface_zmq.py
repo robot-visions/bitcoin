@@ -8,7 +8,7 @@ import struct
 from test_framework.address import ADDRESS_BCRT1_UNSPENDABLE
 from test_framework.test_framework import BitcoinTestFramework
 from test_framework.messages import CTransaction, hash256
-from test_framework.util import assert_equal, connect_nodes
+from test_framework.util import assert_equal
 from io import BytesIO
 from time import sleep
 
@@ -74,7 +74,7 @@ class ZMQTest (BitcoinTestFramework):
         rawtx = ZMQSubscriber(socket, b"rawtx")
 
         self.restart_node(0, ["-zmqpub%s=%s" % (sub.topic.decode(), address) for sub in [hashblock, hashtx, rawblock, rawtx]])
-        connect_nodes(self.nodes[0], 1)
+        self.connect_nodes(0, 1)
         socket.connect(address)
         # Relax so that the subscriber is ready before publishing zmq messages
         sleep(0.2)
@@ -151,7 +151,7 @@ class ZMQTest (BitcoinTestFramework):
         self.nodes[1].generatetoaddress(2, ADDRESS_BCRT1_UNSPENDABLE)
 
         # nodes[0] will reorg chain after connecting back nodes[1]
-        connect_nodes(self.nodes[0], 1)
+        self.connect_nodes(0, 1)
 
         # Should receive nodes[1] tip
         assert_equal(self.nodes[1].getbestblockhash(), hashblock.receive().hex())

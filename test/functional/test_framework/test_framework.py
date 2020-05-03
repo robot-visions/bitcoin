@@ -27,12 +27,12 @@ from .util import (
     PortSeed,
     assert_equal,
     check_json_precision,
-    connect_nodes,
-    disconnect_nodes,
     get_datadir_path,
     initialize_datadir,
+    p2p_port,
     sync_blocks,
     sync_mempools,
+    wait_until,
 )
 
 
@@ -330,9 +330,9 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
         # See fPreferredDownload in net_processing.
         #
         # If further outbound connections are needed, they can be added at the beginning of the test with e.g.
-        # connect_nodes(self.nodes[1], 2)
+        # self.connect_nodes(1, 2)
         for i in range(self.num_nodes - 1):
-            connect_nodes(self.nodes[i + 1], i)
+            self.connect_nodes(i + 1, i)
         self.sync_all()
 
     def setup_nodes(self):
@@ -500,12 +500,35 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
     def wait_for_node_exit(self, i, timeout):
         self.nodes[i].process.wait(timeout)
 
+    def disconnect_nodes(self, from_node, to_node):
+        from_connection = self.nodes[from_node]
+        for peer_id in [peer['id'] for peer in from_connection.getpeerinfo() if "testnode%d" % to_node in peer['subver']]:
+            try:
+                from_connection.disconnectnode(nodeid=peer_id)
+            except JSONRPCException as e:
+                # If this node is disconnected between calculating the peer id
+                # and issuing the disconnect, don't worry about it.
+                # This avoids a race condition if we're mass-disconnecting peers.
+                if e.error['code'] != -29: # RPC_CLIENT_NODE_NOT_CONNECTED
+                    raise
+
+        # wait to disconnect
+        wait_until(lambda: [peer['id'] for peer in from_connection.getpeerinfo() if "testnode%d" % to_node in peer['subver']] == [], timeout=5)
+
+    def connect_nodes(self, from_node, to_node):
+        from_connection = self.nodes[from_node]
+        ip_port = "127.0.0.1:" + str(p2p_port(to_node))
+        from_connection.addnode(ip_port, "onetry")
+        # poll until version handshake complete to avoid race conditions
+        # with transaction relaying
+        wait_until(lambda:  all(peer['version'] != 0 for peer in from_connection.getpeerinfo()))
+
     def split_network(self):
         """
         Split the network of four nodes into nodes 0/1 and 2/3.
         """
-        disconnect_nodes(self.nodes[1], 2)
-        disconnect_nodes(self.nodes[2], 1)
+        self.disconnect_nodes(1, 2)
+        self.disconnect_nodes(2, 1)
         self.sync_all(self.nodes[:2])
         self.sync_all(self.nodes[2:])
 
@@ -513,7 +536,7 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
         """
         Join the (previously split) network halves together.
         """
-        connect_nodes(self.nodes[1], 2)
+        self.connect_nodes(1, 2)
         self.sync_all()
 
     def sync_blocks(self, nodes=None, **kwargs):
