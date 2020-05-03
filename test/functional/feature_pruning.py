@@ -101,11 +101,11 @@ class PruneTest(BitcoinTestFramework):
 
         self.prunedir = os.path.join(self.nodes[2].datadir, self.chain, 'blocks', '')
 
-        self.connect_nodes(self.nodes[0], 1)
-        self.connect_nodes(self.nodes[1], 2)
-        self.connect_nodes(self.nodes[0], 2)
-        self.connect_nodes(self.nodes[0], 3)
-        self.connect_nodes(self.nodes[0], 4)
+        self.connect_nodes(0, 1)
+        self.connect_nodes(1, 2)
+        self.connect_nodes(0, 2)
+        self.connect_nodes(0, 3)
+        self.connect_nodes(0, 4)
         self.sync_blocks(self.nodes[0:5])
 
     def setup_nodes(self):
@@ -148,8 +148,8 @@ class PruneTest(BitcoinTestFramework):
         for j in range(12):
             # Disconnect node 0 so it can mine a longer reorg chain without knowing about node 1's soon-to-be-stale chain
             # Node 2 stays connected, so it hears about the stale blocks and then reorg's when node0 reconnects
-            self.disconnect_nodes(self.nodes[0], 1)
-            self.disconnect_nodes(self.nodes[0], 2)
+            self.disconnect_nodes(0, 1)
+            self.disconnect_nodes(0, 2)
             # Mine 24 blocks in node 1
             mine_large_blocks(self.nodes[1], 24)
 
@@ -157,8 +157,8 @@ class PruneTest(BitcoinTestFramework):
             mine_large_blocks(self.nodes[0], 25)
 
             # Create connections in the order so both nodes can see the reorg at the same time
-            self.connect_nodes(self.nodes[0], 1)
-            self.connect_nodes(self.nodes[0], 2)
+            self.connect_nodes(0, 1)
+            self.connect_nodes(0, 2)
             self.sync_blocks(self.nodes[0:3])
 
         self.log.info("Usage can be over target because of high stale rate: %d" % calc_usage(self.prunedir))
@@ -187,15 +187,15 @@ class PruneTest(BitcoinTestFramework):
         self.log.info("New best height: %d" % self.nodes[1].getblockcount())
 
         # Disconnect node1 and generate the new chain
-        self.disconnect_nodes(self.nodes[0], 1)
-        self.disconnect_nodes(self.nodes[1], 2)
+        self.disconnect_nodes(0, 1)
+        self.disconnect_nodes(1, 2)
 
         self.log.info("Generating new longer chain of 300 more blocks")
         self.nodes[1].generate(300)
 
         self.log.info("Reconnect nodes")
-        self.connect_nodes(self.nodes[0], 1)
-        self.connect_nodes(self.nodes[1], 2)
+        self.connect_nodes(0, 1)
+        self.connect_nodes(0, 2)
         self.sync_blocks(self.nodes[0:3], timeout=120)
 
         self.log.info("Verify height on node 2: %d" % self.nodes[2].getblockcount())
@@ -339,7 +339,7 @@ class PruneTest(BitcoinTestFramework):
         # check that wallet loads successfully when restarting a pruned node after IBD.
         # this was reported to fail in #7494.
         self.log.info("Syncing node 5 to test wallet")
-        self.connect_nodes(self.nodes[0], 5)
+        self.connect_nodes(0, 5)
         nds = [self.nodes[0], self.nodes[5]]
         self.sync_blocks(nds, wait=5, timeout=300)
         self.stop_node(5)  # stop and start to trigger rescan

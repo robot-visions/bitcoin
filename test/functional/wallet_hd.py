@@ -95,7 +95,7 @@ class WalletHDTest(BitcoinTestFramework):
                 assert_equal(hd_info_2["hdkeypath"], "m/0'/0'/"+str(i)+"'")
             assert_equal(hd_info_2["hdmasterfingerprint"], hd_fingerprint)
         assert_equal(hd_add, hd_add_2)
-        self.connect_nodes(self.nodes[0], 1)
+        self.connect_nodes(0, 1)
         self.sync_all()
 
         # Needs rescan
@@ -109,7 +109,7 @@ class WalletHDTest(BitcoinTestFramework):
         shutil.rmtree(os.path.join(self.nodes[1].datadir, self.chain, "chainstate"))
         shutil.copyfile(os.path.join(self.nodes[1].datadir, "hd.bak"), os.path.join(self.nodes[1].datadir, self.chain, "wallets", "wallet.dat"))
         self.start_node(1, extra_args=self.extra_args[1])
-        self.connect_nodes(self.nodes[0], 1)
+        self.connect_nodes(0, 1)
         self.sync_all()
         # Wallet automatically scans blocks older than key on startup
         assert_equal(self.nodes[1].getbalance(), NUM_HD_ADDS + 1)

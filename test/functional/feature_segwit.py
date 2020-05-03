@@ -78,7 +78,7 @@ class SegWitTest(BitcoinTestFramework):
 
     def setup_network(self):
         super().setup_network()
-        self.connect_nodes(self.nodes[0], 2)
+        self.connect_nodes(0, 2)
         self.sync_all()
 
     def success_mine(self, node, txid, sign, redeem_script=""):

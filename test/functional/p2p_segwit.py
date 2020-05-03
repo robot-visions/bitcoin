@@ -200,8 +200,8 @@ class SegWitTest(BitcoinTestFramework):
 
     def setup_network(self):
         self.setup_nodes()
-        self.connect_nodes(self.nodes[0], 1)
-        self.connect_nodes(self.nodes[0], 2)
+        self.connect_nodes(0, 1)
+        self.connect_nodes(0, 2)
         self.sync_all()
 
     # Helper functions
@@ -462,7 +462,7 @@ class SegWitTest(BitcoinTestFramework):
         # node2 doesn't need to be connected for this test.
         # (If it's connected, node0 may propagate an invalid block to it over
         # compact blocks and the nodes would have inconsistent tips.)
-        self.disconnect_nodes(self.nodes[0], 2)
+        self.disconnect_nodes(0, 2)
 
         # Create two outputs, a p2wsh and p2sh-p2wsh
         witness_program = CScript([OP_TRUE])
@@ -524,7 +524,7 @@ class SegWitTest(BitcoinTestFramework):
             # TODO: support multiple acceptable reject reasons.
             test_witness_block(self.nodes[0], self.test_node, block, accepted=False, with_witness=False)
 
-        self.connect_nodes(self.nodes[0], 2)
+        self.connect_nodes(0, 2)
 
         self.utxo.pop(0)
         self.utxo.append(UTXO(txid, 2, value))
@@ -1897,7 +1897,7 @@ class SegWitTest(BitcoinTestFramework):
         # Restart with the new binary
         self.stop_node(2)
         self.start_node(2, extra_args=["-segwitheight={}".format(SEGWIT_HEIGHT)])
-        self.connect_nodes(self.nodes[0], 2)
+        self.connect_nodes(0, 2)
 
         self.sync_blocks()
 

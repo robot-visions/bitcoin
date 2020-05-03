@@ -37,10 +37,10 @@ class RawTransactionsTest(BitcoinTestFramework):
     def setup_network(self):
         self.setup_nodes()
 
-        self.connect_nodes(self.nodes[0], 1)
-        self.connect_nodes(self.nodes[1], 2)
-        self.connect_nodes(self.nodes[0], 2)
-        self.connect_nodes(self.nodes[0], 3)
+        self.connect_nodes(0, 1)
+        self.connect_nodes(1, 2)
+        self.connect_nodes(0, 2)
+        self.connect_nodes(0, 3)
 
     def run_test(self):
         self.log.info("Connect nodes, set fees, generate blocks, and sync")

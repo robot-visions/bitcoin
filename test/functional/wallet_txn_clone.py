@@ -28,8 +28,8 @@ class TxnMallTest(BitcoinTestFramework):
     def setup_network(self):
         # Start with split network:
         super().setup_network()
-        self.disconnect_nodes(self.nodes[1], 2)
-        self.disconnect_nodes(self.nodes[2], 1)
+        self.disconnect_nodes(1, 2)
+        self.disconnect_nodes(2, 1)
 
     def run_test(self):
         if self.options.segwit:
@@ -117,7 +117,7 @@ class TxnMallTest(BitcoinTestFramework):
         self.nodes[2].generate(1)
 
         # Reconnect the split network, and sync chain:
-        self.connect_nodes(self.nodes[1], 2)
+        self.connect_nodes(1, 2)
         self.nodes[2].sendrawtransaction(node0_tx2["hex"])
         self.nodes[2].sendrawtransaction(tx2["hex"])
         self.nodes[2].generate(1)  # Mine another block to make sure we sync

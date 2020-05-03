@@ -41,10 +41,10 @@ class PSBTTest(BitcoinTestFramework):
         online_node = self.nodes[1]
 
         # Disconnect offline node from others
-        self.disconnect_nodes(offline_node, 1)
-        self.disconnect_nodes(online_node, 0)
-        self.disconnect_nodes(offline_node, 2)
-        self.disconnect_nodes(mining_node, 0)
+        self.disconnect_nodes(0, 1)
+        self.disconnect_nodes(1, 0)
+        self.disconnect_nodes(0, 2)
+        self.disconnect_nodes(2, 0)
 
         # Create watchonly on online_node
         online_node.createwallet(wallet_name='wonline', disable_private_keys=True)
@@ -78,8 +78,8 @@ class PSBTTest(BitcoinTestFramework):
         wonline.unloadwallet()
 
         # Reconnect
-        self.connect_nodes(self.nodes[0], 1)
-        self.connect_nodes(self.nodes[0], 2)
+        self.connect_nodes(0, 1)
+        self.connect_nodes(0, 2)
 
     def run_test(self):
         # Create and fund a raw tx for sending 10 BTC

@@ -36,7 +36,7 @@ class AbortNodeTest(BitcoinTestFramework):
         # attempt.
         self.nodes[1].generate(3)
         with self.nodes[0].assert_debug_log(["Failed to disconnect block"]):
-            self.connect_nodes(self.nodes[0], 1)
+            self.connect_nodes(0, 1)
             self.nodes[1].generate(1)
 
             # Check that node0 aborted

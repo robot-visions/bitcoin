@@ -48,8 +48,8 @@ class NetTest(BitcoinTestFramework):
 
     def run_test(self):
         self.log.info('Connect nodes both way')
-        self.connect_nodes(self.nodes[0], 1)
-        self.connect_nodes(self.nodes[1], 0)
+        self.connect_nodes(0, 1)
+        self.connect_nodes(1, 0)
 
         self._test_connection_count()
         self._test_getnettotals()
@@ -103,8 +103,8 @@ class NetTest(BitcoinTestFramework):
 
         self.nodes[0].setnetworkactive(state=True)
         self.log.info('Connect nodes both way')
-        self.connect_nodes(self.nodes[0], 1)
-        self.connect_nodes(self.nodes[1], 0)
+        self.connect_nodes(0, 1)
+        self.connect_nodes(1, 0)
 
         assert_equal(self.nodes[0].getnetworkinfo()['networkactive'], True)
         assert_equal(self.nodes[0].getnetworkinfo()['connections'], 2)

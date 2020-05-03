@@ -262,7 +262,7 @@ class WalletTest(BitcoinTestFramework):
 
         # Now confirm tx_orig
         self.restart_node(1, ['-persistmempool=0'])
-        self.connect_nodes(self.nodes[0], 1)
+        self.connect_nodes(0, 1)
         sync_blocks(self.nodes)
         self.nodes[1].sendrawtransaction(tx_orig)
         self.nodes[1].generatetoaddress(1, ADDRESS_WATCHONLY)
